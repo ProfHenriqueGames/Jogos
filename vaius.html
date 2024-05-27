@@ -1,0 +1,48 @@
+
+
+User
+fazer um jogo javascript
+ChatGPT
+Certamente! Criar um jogo em JavaScript pode ser um projeto empolgante. Vou te fornecer um exemplo simples de um jogo em JavaScript, usando HTML para a estrutura básica. Este será um jogo de adivinhação, onde o jogador precisa adivinhar um número aleatório. Vamos lá:
+
+html
+Copy code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo de Adivinhação</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jogo de Adivinhação</h1>
+  <p>Tente adivinhar o número entre 1 e 10:</p>
+  <input type="number" id="guessInput">
+  <button onclick="checkGuess()">Verificar</button>
+  <p id="message"></p>
+
+  <script>
+    // Gera um número aleatório entre 1 e 10
+    const randomNumber = Math.floor(Math.random() * 10) + 1;
+    let attempts = 0;
+
+    function checkGuess() {
+      const guess = document.getElementById('guessInput').value;
+      attempts++;
+
+      if (guess == randomNumber) {
+        document.getElementById('message').innerHTML = `Parabéns! Você acertou em ${attempts} tentativas.`;
+      } else {
+        document.getElementById('message').innerHTML = 'Tente novamente.';
+      }
+    }
+  </script>
+</body>
+</html>
