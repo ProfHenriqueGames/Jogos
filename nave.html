@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shooter Game with Points</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #000;
+    }
+    #gameCanvas {
+        display: block;
+        margin: auto;
+        background-color: #333;
+    }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script>
+    var canvas = document.getElementById("gameCanvas");
+    var ctx = canvas.getContext("2d");
+
+    var player = {
+        x: canvas.width / 2,
+        y: canvas.height - 30,
+        width: 20,
+        height: 20,
+        color: "#00ff00",
+        speed: 5
+    };
+
+    var enemies = [];
+    var enemySpeed = 2;
+    var enemyWidth = 20;
+    var enemyHeight = 20;
+    var enemyColor = "#ff0000";
+    var enemySpawnInterval = 1000;
+    var lastEnemySpawnTime = 0;
+
+    var bullets = [];
+    var bulletSpeed = 7;
+    var bulletWidth = 4;
+    var bulletHeight = 10;
+    var bulletColor = "#ffffff";
+
+    var score = 0;
+
+    var keys = [];
+    document.addEventListener("keydown", function (e) {
+        keys[e.keyCode] = true;
+    });
+    document.addEventListener("keyup", function (e) {
+        delete keys[e.keyCode];
+    });
+
+    function drawPlayer() {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function drawEnemies() {
+        ctx.fillStyle = enemyColor;
+        enemies.forEach(function(enemy) {
+            ctx.fillRect(enemy.x, enemy.y, enemyWidth, enemyHeight);
+        });
+    }
+
+    function drawBullets() {
+        ctx.fillStyle = bulletColor;
+        bullets.forEach(function(bullet) {
+            ctx.fillRect(bullet.x, bullet.y, bulletWidth, bulletHeight);
+        });
+    }
+
+    function drawScore() {
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "16px Arial";
+        ctx.fillText("Score: " + score, 20, 30);
+    }
+
+    function update() {
+        // Move player
+        if (keys[37] && player.x > 0) {
+            player.x -= player.speed;
+        }
+        if (keys[39] && player.x < canvas.width - player.width) {
+            player.x += player.speed;
+        }
+
+        // Shoot bullets
+        if (keys[32]) {
+            bullets.push({
+                x: player.x + player.width / 2 - bulletWidth / 2,
+                y: player.y,
+                width: bulletWidth,
+                height: bulletHeight,
+                speed: bulletSpeed
+            });
+        }
+
+        // Move bullets
+        bullets.forEach(function(bullet) {
+            bullet.y -= bullet.speed;
+        });
+
+        // Remove bullets that are out of the screen
+        bullets = bullets.filter(function(bullet) {
+            return bullet.y > 0;
+        });
+
+        // Spawn enemies
+        var currentTime = new Date().getTime();
+        if (currentTime - lastEnemySpawnTime > enemySpawnInterval) {
+            lastEnemySpawnTime = currentTime;
+            enemies.push({
+                x: Math.random() * (canvas.width - enemyWidth),
+                y: -enemyHeight,
+                width: enemyWidth,
+                height: enemyHeight,
+                speed: enemySpeed
+            });
+        }
+
+        // Move enemies
+        enemies.forEach(function(enemy) {
+            enemy.y += enemy.speed;
+        });
+
+        // Check for collisions
+        bullets.forEach(function(bullet) {
+            enemies.forEach(function(enemy, index) {
+                if (bullet.x < enemy.x + enemyWidth &&
+                    bullet.x + bulletWidth > enemy.x &&
+                    bullet.y < enemy.y + enemyHeight &&
+                    bullet.y + bulletHeight > enemy.y) {
+                        bullets.splice(bullets.indexOf(bullet), 1);
+                        enemies.splice(index, 1);
+                        score += 10; // Increase score
+                }
+            });
+        });
+    }
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawPlayer();
+        drawEnemies();
+        drawBullets();
+        drawScore();
+    }
+
+    function gameLoop() {
+        update();
+        render();
+        requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+</script>
+
+</body>
+</html>

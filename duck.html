@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duck Hunt</title>
+<style>
+    canvas {
+        display: block;
+        margin: 0 auto;
+        background-color: #87CEEB;
+    }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let duck = {
+        x: 100,
+        y: 100,
+        speed: 2,
+        width: 50,
+        height: 50,
+        alive: true
+    };
+
+    let score = 0;
+    let timeLeft = 10;
+    let gameInterval;
+
+    canvas.addEventListener('click', shootDuck);
+
+    function shootDuck(event) {
+        const mouseX = event.clientX - canvas.getBoundingClientRect().left;
+        const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+
+        if (mouseX >= duck.x && mouseX <= duck.x + duck.width &&
+            mouseY >= duck.y && mouseY <= duck.y + duck.height && duck.alive) {
+            duck.alive = false;
+            score++;
+            resetDuck();
+        }
+    }
+
+    function resetDuck() {
+        duck.x = Math.random() * (canvas.width - duck.width);
+        duck.y = Math.random() * (canvas.height - duck.height);
+        duck.alive = true;
+    }
+
+    function drawDuck() {
+        if (duck.alive) {
+            ctx.beginPath();
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(duck.x, duck.y, duck.width, duck.height);
+            ctx.closePath();
+        }
+    }
+
+    function drawScore() {
+        ctx.font = '24px Arial';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('Score: ' + score, 10, 30);
+    }
+
+    function drawTimeLeft() {
+        ctx.font = '24px Arial';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('Time left: ' + timeLeft + 's', canvas.width - 150, 30);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawDuck();
+        drawScore();
+        drawTimeLeft();
+
+        if (score >= 10) {
+            clearInterval(gameInterval);
+            ctx.fillText('You win!', canvas.width / 2 - 50, canvas.height / 2);
+        } else if (timeLeft <= 0) {
+            clearInterval(gameInterval);
+            ctx.fillText('Game over! You lose!', canvas.width / 2 - 100, canvas.height / 2);
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    gameInterval = setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+        }
+    }, 1000);
+
+    draw();
+</script>
+</body>
+</html>

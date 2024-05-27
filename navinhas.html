@@ -1,0 +1,201 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game: Space Shooter</title>
+<style>
+    canvas {
+        border: 2px solid black;
+        display: block;
+        margin: 0 auto;
+        background-color: black;
+    }
+    #gameOver {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 40px;
+        color: red;
+    }
+</style>
+</head>
+<body>
+<button onclick="startGame()">Start Game</button>
+<div id="score">Score: 0</div>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<div id="gameOver">Game Over</div>
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let gameInterval;
+
+    let score = 0;
+    let gameOver = false;
+
+    // Player object
+    const player = {
+        x: canvas.width / 2,
+        y: canvas.height - 30,
+        width: 50,
+        height: 50,
+        speed: 1.15
+    };
+
+    // Player controls
+    const keys = {};
+
+    document.addEventListener('keydown', event => {
+        keys[event.key] = true;
+    });
+
+    document.addEventListener('keyup', event => {
+        keys[event.key] = false;
+    });
+
+    // Bullets
+    const bullets = [];
+    const bulletSpeed = 10;
+
+    // Enemies
+    const enemies = [];
+    const enemySpeed = 2;
+    const spawnRate = 1000; // in milliseconds
+    let lastSpawn = -1;
+
+    // Stars
+    const stars = [];
+    const numStars = 100;
+
+    // Function to generate random stars
+    function generateStars() {
+        for (let i = 0; i < numStars; i++) {
+            const star = {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2,
+                speed: Math.random() * 0.5
+            };
+            stars.push(star);
+        }
+    }
+    generateStars();
+
+    function startGame() {
+        score = 0;
+        gameOver = false;
+        document.getElementById('score').innerText = 'Score: ' + score;
+        document.getElementById('gameOver').style.display = 'none';
+        enemies.length = 0;
+        bullets.length = 0;
+        player.x = canvas.width / 2;
+        player.y = canvas.height - 30;
+        lastSpawn = -1;
+        gameInterval = setInterval(update, 1000/60); // 60 FPS
+    }
+
+    function spawnEnemy() {
+        const enemy = {
+            x: Math.random() * canvas.width,
+            y: 0,
+            width: 30,
+            height: 30
+        };
+        enemies.push(enemy);
+    }
+
+    function update() {
+        if (gameOver) return;
+
+        // Move player
+        if (keys['ArrowLeft'] && player.x - player.speed > 0) {
+            player.x -= player.speed;
+        }
+        if (keys['ArrowRight'] && player.x + player.width + player.speed < canvas.width) {
+            player.x += player.speed;
+        }
+
+        // Shoot (press 'Z')
+        if (keys['z']) {
+            const bullet = {
+                x: player.x + player.width / 2,
+                y: player.y,
+                width: 5,
+                height: 10
+            };
+            bullets.push(bullet);
+        }
+
+        // Update bullets
+        bullets.forEach(bullet => {
+            bullet.y -= bulletSpeed;
+        });
+
+        // Update enemies
+        enemies.forEach(enemy => {
+            enemy.y += enemySpeed;
+            // Collision detection with player
+            if (enemy.x < player.x + player.width &&
+                enemy.x + enemy.width > player.x &&
+                enemy.y < player.y + player.height &&
+                enemy.y + enemy.height > player.y) {
+                // Game over
+                clearInterval(gameInterval);
+                gameOver = true;
+                document.getElementById('gameOver').style.display = 'block';
+            }
+            // Collision detection with bullets
+            bullets.forEach(bullet => {
+                if (bullet.x < enemy.x + enemy.width &&
+                    bullet.x + bullet.width > enemy.x &&
+                    bullet.y < enemy.y + enemy.height &&
+                    bullet.y + bullet.height > enemy.y) {
+                    // Remove enemy and bullet on collision
+                    const enemyIndex = enemies.indexOf(enemy);
+                    const bulletIndex = bullets.indexOf(bullet);
+                    enemies.splice(enemyIndex, 1);
+                    bullets.splice(bulletIndex, 1);
+                    score += 10; // Increment score
+                    document.getElementById('score').innerText = 'Score: ' + score;
+                }
+            });
+        });
+
+        // Spawn enemies
+        const now = Date.now();
+        if (now - lastSpawn > spawnRate) {
+            spawnEnemy();
+            lastSpawn = now;
+        }
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw stars
+        ctx.fillStyle = 'white';
+        stars.forEach(star => {
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // Draw player
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+
+        // Draw bullets
+        ctx.fillStyle = 'red';
+        bullets.forEach(bullet => {
+            ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+        });
+
+        // Draw enemies
+        ctx.fillStyle = 'green';
+        enemies.forEach(enemy => {
+            ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+        });
+    }
+</script>
+</body>
+</html>

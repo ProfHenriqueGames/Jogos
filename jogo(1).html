@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo de Adivinhação</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #ff0000;
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        color: #565454;
+        margin-top: 50px;
+    }
+    p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+    #guess {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ffffff;
+        border-radius: 5px;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    #result {
+        font-size: 1.2em;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+    <h1>Jogo de Adivinhação</h1>
+    <p>Eu escolhi um número entre 1 e 100. Tente adivinhar!</p>
+    <input type="number" id="guess" min="1" max="100">
+    <button onclick="checkGuess()">Adivinhar</button>
+    <p id="result"></p>
+
+    <script>
+        // Gerar um número aleatório entre 1 e 100
+        const randomNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById('guess').value);
+            attempts++;
+            const resultP = document.getElementById('result');
+
+            if (guess === randomNumber) {
+                resultP.textContent = `Parabéns! Você acertou em ${attempts} tentativas.`;
+                resultP.style.color = 'green';
+                document.getElementById('guess').setAttribute('disabled', 'true');
+            } else if (guess < randomNumber) {
+                resultP.textContent = 'Tente um número maior.';
+                resultP.style.color = 'branco';
+            } else {
+                resultP.textContent = 'Tente um número menor.';
+                resultP.style.color = 'branco';
+            }
+        }
+    </script>
+</body>
+</html>

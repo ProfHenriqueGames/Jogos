@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shotgun Escape</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    #gameCanvas {
+        background-color: #000;
+        display: block;
+        margin: 0 auto;
+    }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const player = {
+        x: 50,
+        y: canvas.height / 2,
+        width: 20,
+        height: 20,
+        speed: 5
+    };
+    
+    let obstacles = [];
+    let obstacleSpeed = 3;
+    let score = 0;
+    let gameOver = false;
+    
+    function drawPlayer() {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+    
+    function drawObstacles() {
+        ctx.fillStyle = '#f00';
+        obstacles.forEach(obstacle => {
+            ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        });
+    }
+    
+    function movePlayer(direction) {
+        if (direction === 'up' && player.y > 0) {
+            player.y -= player.speed;
+        } else if (direction === 'down' && player.y < canvas.height - player.height) {
+            player.y += player.speed;
+        }
+    }
+    
+    function generateObstacle() {
+        const obstacle = {
+            x: canvas.width,
+            y: Math.random() * (canvas.height - 50),
+            width: 30,
+            height: 30
+        };
+        obstacles.push(obstacle);
+    }
+    
+    function updateObstacles() {
+        obstacles.forEach(obstacle => {
+            obstacle.x -= obstacleSpeed;
+            if (obstacle.x + obstacle.width < 0) {
+                obstacles.shift();
+                score++;
+            }
+            if (player.x < obstacle.x + obstacle.width && 
+                player.x + player.width > obstacle.x &&
+                player.y < obstacle.y + obstacle.height &&
+                player.y + player.height > obstacle.y) {
+                gameOver = true;
+            }
+        });
+    }
+    
+    function updateGame() {
+        if (!gameOver) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            drawObstacles();
+            updateObstacles();
+            requestAnimationFrame(updateGame);
+        } else {
+            ctx.fillStyle = '#fff';
+            ctx.font = '30px Arial';
+            ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2 - 15);
+            ctx.fillText('Score: ' + score, canvas.width / 2 - 70, canvas.height / 2 + 20);
+        }
+    }
+    
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowUp') {
+            movePlayer('up');
+        } else if (event.key === 'ArrowDown') {
+            movePlayer('down');
+        }
+    });
+    
+    window.addEventListener('click', () => {
+        if (!gameOver) {
+            player.y -= 50; // Recoil effect
+        }
+    });
+    
+    setInterval(generateObstacle, 1500);
+    
+    updateGame();
+</script>
+</body>
+</html>

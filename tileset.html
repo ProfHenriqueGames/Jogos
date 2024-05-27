@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Exemplo de Tileset em CSS</title>
+  <style>
+    .tileset {
+      width: 64px; /* largura de cada tile */
+      height: 64px; /* altura de cada tile */
+      background-image: url('tileset.png');
+    }
+
+    .tile {
+      display: inline-block;
+      width: 12px; /* largura de exibição do tile */
+      height: 12px; /* altura de exibição do tile */
+    }
+
+    .tile1 {
+      background-position: 0 0; /* posição do primeiro tile no tileset */
+    }
+
+    .tile2 {
+      background-position: -12px 0; /* posição do segundo tile no tileset */
+    }
+    .tile3 {
+      background-position: -64px 0; /* posição do segundo tile no tileset */
+    }
+
+    /* Adicione mais classes para cada tile no tileset conforme necessário */
+  </style>
+</head>
+<body>
+  <div class="tileset">
+    <div class="tile tile1"></div>
+    <div class="tile tile2"></div>
+    <div class="tile tile3"></div>
+    <!-- Adicione mais divs com classes diferentes para exibir outros tiles -->
+  </div>
+  <div class="tileset">
+    <div class="tile tile1"></div>
+    <!-- Adicione mais divs com classes diferentes para exibir outros tiles -->
+  </div>
+  <div class="tileset">
+    <div class="tile tile1"></div>
+    <!-- Adicione mais divs com classes diferentes para exibir outros tiles -->
+  </div>
+  <div class="tileset">
+    <div class="tile tile1"></div>
+    <!-- Adicione mais divs com classes diferentes para exibir outros tiles -->
+  </div>
+</body>
+</html>

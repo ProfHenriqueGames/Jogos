@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jogo de Tiles com Imagens</title>
+  <style>
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+      gap: 2px;
+    }
+
+    .tile {
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="board"></div>
+
+  <script>
+    const board = document.querySelector('.board');
+    const size = 4; // Tamanho do tabuleiro (4x4)
+    const images = [
+      'https://via.placeholder.com/100x100/0000FF?text=1',
+      'https://via.placeholder.com/100x100/FF0000?text=2',
+      'https://via.placeholder.com/100x100/00FF00?text=3',
+      'https://via.placeholder.com/100x100/FFFF00?text=4',
+      'https://via.placeholder.com/100x100/FF00FF?text=5',
+      'https://via.placeholder.com/100x100/00FFFF?text=6',
+      'https://via.placeholder.com/100x100/800080?text=7',
+      'https://via.placeholder.com/100x100/008000?text=8'
+    ];
+
+    // Embaralhar imagens
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Criar tiles
+    const shuffledImages = shuffleArray([...images, ...images]);
+    for (let i = 0; i < size * size; i++) {
+      const tile = document.createElement('div');
+      tile.classList.add('tile');
+      tile.style.backgroundImage = `url(${shuffledImages[i]})`;
+      board.appendChild(tile);
+    }
+  </script>
+</body>
+</html>

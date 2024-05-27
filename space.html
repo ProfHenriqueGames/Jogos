@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Shooter Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            background-color: #000;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        // Inicialização do canvas e contexto
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Variáveis do jogador
+        let player = {
+            x: canvas.width / 2,
+            y: canvas.height - 50,
+            width: 50,
+            height: 50,
+            speed: 5
+        };
+
+        // Variáveis dos tiros
+        let bullets = [];
+        const bulletSpeed = 5;
+        const bulletWidth = 5;
+        const bulletHeight = 10;
+
+        // Variáveis dos inimigos
+        let enemies = [];
+        const enemySpeed = 2;
+        const enemyWidth = 50;
+        const enemyHeight = 50;
+
+        // Controles do jogador
+        document.addEventListener('keydown', keyDownHandler);
+        document.addEventListener('keyup', keyUpHandler);
+
+        let rightPressed = false;
+        let leftPressed = false;
+        let spacePressed = false;
+
+        function keyDownHandler(e) {
+            if (e.key === 'Right' || e.key === 'ArrowRight') {
+                rightPressed = true;
+            } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+                leftPressed = true;
+            } else if (e.key === ' ') {
+                spacePressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key === 'Right' || e.key === 'ArrowRight') {
+                rightPressed = false;
+            } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+                leftPressed = false;
+            } else if (e.key === ' ') {
+                spacePressed = false;
+            }
+        }
+
+        // Função de desenho do jogador
+        function drawPlayer() {
+            ctx.beginPath();
+            ctx.rect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#00ff00';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Função de desenho dos tiros
+        function drawBullets() {
+            bullets.forEach((bullet, index) => {
+                ctx.beginPath();
+                ctx.rect(bullet.x, bullet.y, bulletWidth, bulletHeight);
+                ctx.fillStyle = '#00ffff';
+                ctx.fill();
+                ctx.closePath();
+
+                // Movimento dos tiros
+                bullet.y -= bulletSpeed;
+
+                // Remover tiros fora da tela
+                if (bullet.y < 0) {
+                    bullets.splice(index, 1);
+                }
+            });
+        }
+
+        // Função de desenho dos inimigos
+        function drawEnemies() {
+            enemies.forEach((enemy, index) => {
+                ctx.beginPath();
+                ctx.rect(enemy.x, enemy.y, enemyWidth, enemyHeight);
+                ctx.fillStyle = '#ff0000';
+                ctx.fill();
+                ctx.closePath();
+
+                // Movimento dos inimigos
+                enemy.y += enemySpeed;
+
+                // Remover inimigos quando atingidos por tiros
+                bullets.forEach((bullet, bulletIndex) => {
+                    if (bullet.x > enemy.x && bullet.x < enemy.x + enemyWidth && bullet.y < enemy.y + enemyHeight) {
+                        bullets.splice(bulletIndex, 1);
+                        enemies.splice(index, 1);
+                    }
+                });
+
+                // Fim de jogo se inimigos chegarem ao final da tela
+                if (enemy.y + enemyHeight > canvas.height) {
+                    alert('Game Over');
+                    document.location.reload();
+                }
+            });
+        }
+
+        // Função principal de desenho do jogo
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawPlayer();
+            drawBullets();
+            drawEnemies();
+
+            // Movimento do jogador
+            if (rightPressed && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            } else if (leftPressed && player.x > 0) {
+                player.x -= player.speed;
+            }
+
+            // Disparo de tiros
+            if (spacePressed) {
+                bullets.push({ x: player.x + player.width / 2 - bulletWidth / 2, y: player.y });
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        // Gerar inimigos aleatoriamente
+        function generateEnemies() {
+            setInterval(() => {
+                let x = Math.random() * (canvas.width - enemyWidth);
+                enemies.push({ x: x, y: 0 });
+            }, 1000);
+        }
+
+        generateEnemies();
+        draw();
+    </script>
+</body>
+</html>

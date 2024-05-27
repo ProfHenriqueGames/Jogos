@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pong 1972</title>
+<style>
+    canvas {
+        border: 1px solid #000;
+        display: block;
+        margin: 0 auto;
+    }
+</style>
+</head>
+<body>
+<canvas id="pongCanvas" width="800" height="400"></canvas>
+
+<script>
+    const canvas = document.getElementById('pongCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Tamanho da raquete e da bola
+    const raqueteWidth = 10;
+    const raqueteHeight = 70;
+    const bolaSize = 10;
+
+    // Posições iniciais da raquete e da bola
+    let raqueteEsquerdaY = canvas.height / 2 - raqueteHeight / 2;
+    let raqueteDireitaY = canvas.height / 2 - raqueteHeight / 2;
+    let bolaX = canvas.width / 2;
+    let bolaY = canvas.height / 2;
+    let bolaSpeedX = 3;
+    let bolaSpeedY = 3;
+
+    // Controle de teclado
+    const teclas = {};
+    window.addEventListener('keydown', e => {
+        teclas[e.key] = true;
+    });
+    window.addEventListener('keyup', e => {
+        teclas[e.key] = false;
+    });
+
+    // Placar
+    let placarEsquerda = 0;
+    let placarDireita = 0;
+    let rodadas = 10;
+    let vencedor = '';
+
+    function desenharRaquetes() {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, raqueteEsquerdaY, raqueteWidth, raqueteHeight);
+        ctx.fillRect(canvas.width - raqueteWidth, raqueteDireitaY, raqueteWidth, raqueteHeight);
+    }
+
+    function desenharBola() {
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(bolaX, bolaY, bolaSize, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function moverRaquetes() {
+        if (teclas['w'] && raqueteEsquerdaY > 0) {
+            raqueteEsquerdaY -= 5;
+        }
+        if (teclas['s'] && raqueteEsquerdaY + raqueteHeight < canvas.height) {
+            raqueteEsquerdaY += 5;
+        }
+        if (teclas['ArrowUp'] && raqueteDireitaY > 0) {
+            raqueteDireitaY -= 5;
+        }
+        if (teclas['ArrowDown'] && raqueteDireitaY + raqueteHeight < canvas.height) {
+            raqueteDireitaY += 5;
+        }
+    }
+
+    function moverBola() {
+        bolaX += bolaSpeedX;
+        bolaY += bolaSpeedY;
+
+        // Colisão com as raquetes
+        if (bolaX <= raqueteWidth && bolaY >= raqueteEsquerdaY && bolaY <= raqueteEsquerdaY + raqueteHeight) {
+            bolaSpeedX = -bolaSpeedX;
+        }
+        if (bolaX >= canvas.width - raqueteWidth - bolaSize && bolaY >= raqueteDireitaY && bolaY <= raqueteDireitaY + raqueteHeight) {
+            bolaSpeedX = -bolaSpeedX;
+        }
+
+        // Colisão com as paredes superior e inferior
+        if (bolaY <= 0 || bolaY >= canvas.height - bolaSize) {
+            bolaSpeedY = -bolaSpeedY;
+        }
+
+        // Verifica se houve gol
+        if (bolaX <= 0) {
+            placarDireita++;
+            bolaX = canvas.width / 2;
+            bolaY = canvas.height / 2;
+            if (placarDireita === rodadas) {
+                vencedor = 'Direita';
+            }
+        } else if (bolaX >= canvas.width) {
+            placarEsquerda++;
+            bolaX = canvas.width / 2;
+            bolaY = canvas.height / 2;
+            if (placarEsquerda === rodadas) {
+                vencedor = 'Esquerda';
+            }
+        }
+    }
+
+    function desenharPlacar() {
+        ctx.font = '20px Arial';
+        ctx.fillText(`Esquerda: ${placarEsquerda} | Direita: ${placarDireita}`, 10, 30);
+        if (vencedor) {
+            ctx.fillText(`Vencedor: ${vencedor}`, canvas.width / 2 - 70, 30);
+        }
+    }
+
+    function desenhar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        desenharRaquetes();
+        desenharBola();
+        desenharPlacar();
+    }
+
+    function loopJogo() {
+        if (!vencedor) {
+            moverRaquetes();
+            moverBola();
+            desenhar();
+            requestAnimationFrame(loopJogo);
+        }
+    }
+
+    loopJogo();
+</script>
+</body>
+</html>
+
+

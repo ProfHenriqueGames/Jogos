@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    // Captura o canvas e seu contexto
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Define a nave do jogador
+    const player = {
+      x: canvas.width / 2,
+      y: canvas.height - 30,
+      width: 50,
+      height: 50,
+      color: 'blue',
+      speed: 5,
+      shooting: false,
+      bullets: []
+    };
+
+    // Define um alvo
+    const target = {
+      x: Math.random() * canvas.width,
+      y: 0,
+      width: 20,
+      height: 20,
+      color: 'red',
+      speed: 2
+    };
+
+    // Função para desenhar a nave do jogador
+    function drawPlayer() {
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    // Função para desenhar os alvos
+    function drawTarget() {
+      ctx.fillStyle = target.color;
+      ctx.fillRect(target.x, target.y, target.width, target.height);
+    }
+
+    // Função para mover a nave do jogador
+    function movePlayer() {
+      if (player.x < 0) {
+        player.x = 0;
+      } else if (player.x > canvas.width - player.width) {
+        player.x = canvas.width - player.width;
+      }
+    }
+
+    // Função para mover os alvos
+    function moveTarget() {
+      target.y += target.speed;
+      if (target.y > canvas.height) {
+        target.x = Math.random() * canvas.width;
+        target.y = 0;
+      }
+    }
+
+    // Função para desenhar tudo
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPlayer();
+      drawTarget();
+    }
+
+    // Função para atualizar o jogo
+    function update() {
+      moveTarget();
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    // Função para lidar com os controles do jogador
+    function handleControls(e) {
+      switch (e.key) {
+        case 'ArrowLeft':
+          player.x -= player.speed;
+          break;
+        case 'ArrowRight':
+          player.x += player.speed;
+          break;
+        case ' ':
+          // Implementar a função de tiro aqui
+          break;
+      }
+      movePlayer();
+    }
+
+    // Adiciona um evento de escuta de teclado
+    window.addEventListener('keydown', handleControls);
+
+    // Inicia o jogo
+    update();
+  </script>
+</body>
+</html>
+
+
